@@ -7,6 +7,7 @@ phases:
     commands:
     - echo Logging in to Amazon ECR...
     - aws --version
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
     - $(aws ecr-public get-login --region $AWS_DEFAULT_REGION --no-include-email)
     - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
     - IMAGE_URI=${REPOSITORY_URI}:${TAG}
@@ -15,7 +16,7 @@ phases:
     - echo Build started on `date`
     - echo $IMAGE_URI
     - mvn clean package -Ddockerfile.skip
-    - docker build --tag $IMAGE_URI .
+    - docker build -t $IMAGE_URI .
   post_build:
     commands:
     - printenv
